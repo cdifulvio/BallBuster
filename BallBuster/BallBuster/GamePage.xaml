@@ -1,0 +1,28 @@
+﻿<phone:PhoneApplicationPage 
+    x:Class="BallBuster.GamePage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:phone="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone"
+    xmlns:shell="clr-namespace:Microsoft.Phone.Shell;assembly=Microsoft.Phone"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    FontFamily="{StaticResource PhoneFontFamilyNormal}"
+    FontSize="{StaticResource PhoneFontSizeNormal}"
+    Foreground="{StaticResource PhoneForegroundBrush}"
+    SupportedOrientations="Portrait" Orientation="Portrait"
+    mc:Ignorable="d" d:DesignHeight="800" d:DesignWidth="480"
+    shell:SystemTray.IsVisible="False">
+    
+    <!--No XAML content is required as the page is rendered entirely with the XNA Framework-->
+    <Grid x:Name="LayoutRoot" Background="Transparent">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="67" />
+            <RowDefinition Height="733*" />
+        </Grid.RowDefinitions>
+        <TextBlock Height="55" HorizontalAlignment="Left" Margin="12,12,0,0" Name="ScoreLabel" Text="Score:" VerticalAlignment="Top" FontSize="40" Grid.RowSpan="2" />
+        <TextBlock Height="55" HorizontalAlignment="Left" Margin="125,12,0,0" Name="TotalScoreLabel" Text="0" VerticalAlignment="Top" Width="103" FontSize="40" />
+        <TextBlock Height="55" HorizontalAlignment="Left" Margin="248,12,0,0" Name="HighScoreLabel" Text="High:" VerticalAlignment="Top" FontSize="40" />
+        <TextBlock Height="55" HorizontalAlignment="Left" Margin="355,12,0,0" Name="HighScoreNumber" Text="" VerticalAlignment="Top" Width="104" FontSize="40" />
+        <TextBlock Grid.Row="1" Height="635" HorizontalAlignment="Center" Margin="0,55,0,0" Name="FloatingScoreLabel" Text="" VerticalAlignment="Top" Width="480" Opacity="0.7" TextAlignment="Center" FontSize="200" />
+    </Grid>
+</phone:PhoneApplicationPage>
