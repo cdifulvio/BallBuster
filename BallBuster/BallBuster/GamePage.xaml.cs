@@ -156,6 +156,7 @@ namespace BallBuster
                         if (gameBoard.IsLost)
                         {
                             SaveHighScore(gameBoard.Score);
+                            MessageBox.Show("YOU LOSE HAH", "YOu lose", MessageBoxButton.OK);
                             NavigationService.GoBack();
                         }
                     }

@@ -29,7 +29,6 @@
             <!--Create a single button to navigate to the second page which is rendered with the XNA Framework-->
             <Button Content="Play!" Click="Button_Click" Margin="0,331,152,351" HorizontalAlignment="Right" Width="160" />
             <TextBlock Height="82" HorizontalAlignment="Left" Margin="43,124,0,0" Name="textBlock1" Text="BALL BUSTER" VerticalAlignment="Top" Width="374" FontFamily="Microsoft MHei" FontSize="60" TextAlignment="Center" FontWeight="Bold" FontStretch="ExtraCondensed" TextTrimming="None"><TextBlock.Foreground><LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0"><GradientStop Color="#FF931215" Offset="0.858" /><GradientStop Color="#FF49310E" Offset="0.155" /></LinearGradientBrush></TextBlock.Foreground></TextBlock>
-            <Button Content="High Scores" Height="72" HorizontalAlignment="Left" Margin="130,410,0,0" Name="HighScoreButton" VerticalAlignment="Top" Width="190" />
         </Grid>
     </Grid>
  
