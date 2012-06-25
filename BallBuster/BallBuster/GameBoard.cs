@@ -35,6 +35,7 @@ namespace BallBuster
         private int totalScore;
         private int selectionScore;
 
+
         public bool IsLost
         {
             get { return isLost; }
@@ -81,8 +82,8 @@ namespace BallBuster
                 }
             }
 
-            numberOfColumns = 480 / mColorDictionary["blue"].Height;
-            numberOfRows = 660 / mColorDictionary["blue"].Width;
+            numberOfColumns = 480 / mColorDictionary["blue"].Width;
+            numberOfRows = 660 / mColorDictionary["blue"].Height;
             ballMatrix = new Ball[numberOfColumns, numberOfRows];
             Random random = new Random();
 
@@ -137,12 +138,17 @@ namespace BallBuster
                 selectedVerticalIndex = (int)((yCoordinate - 100f) / 60f);
 
                 //Make sure that the position is within the limits of the matrix
-                if (selectedHorizontalIndex >= 0 && selectedVerticalIndex >= 0 && selectedVerticalIndex < numberOfRows && selectedHorizontalIndex < numberOfColumns && ballMatrix[selectedHorizontalIndex, selectedVerticalIndex].IsAlive)
+                if (selectedHorizontalIndex >= 0 && selectedVerticalIndex >= 0 && 
+                    selectedVerticalIndex < numberOfRows && 
+                    selectedHorizontalIndex < numberOfColumns && 
+                    ballMatrix[selectedHorizontalIndex, selectedVerticalIndex].IsAlive)
                 {
                     Ball selectedBall = ballMatrix[selectedHorizontalIndex, selectedVerticalIndex];
 
                     //If already tapped once and the second tap is in the same place, continue with removing the balls
-                    if (previouslySelectedHorizontalIndex == selectedHorizontalIndex && previouslySelectedVerticalIndex == selectedVerticalIndex && firstTap)
+                    if (previouslySelectedHorizontalIndex == selectedHorizontalIndex && 
+                        previouslySelectedVerticalIndex == selectedVerticalIndex && 
+                        firstTap)
                     {
                         firstTap = false;
                         RemoveAdjacentBalls(selectedBall, "");
@@ -150,6 +156,7 @@ namespace BallBuster
                         showScore = false;
                         UpdateColumns();
                         UpdateRows();
+
                         if (IsGameLost())
                         {
                             isLost = true;
@@ -300,11 +307,7 @@ namespace BallBuster
         {
             lastPopulatedListOfBalls.Clear();
             PopulateListOfAdjacentBalls(ball, "");
-
-            foreach (Ball b in lastPopulatedListOfBalls)
-            {
-                b.IsUsed = false;
-            }
+            lastPopulatedListOfBalls.ForEach(b => b.IsUsed = false);
 
             return (int)Math.Pow(lastPopulatedListOfBalls.Count, 2);
         }
@@ -372,11 +375,7 @@ namespace BallBuster
         {
             lastPopulatedListOfBalls.Clear();
             PopulateListOfAdjacentBalls(ball, "");
-
-            foreach (Ball b in lastPopulatedListOfBalls)
-            {
-                b.IsAlive = false;
-            }
+            lastPopulatedListOfBalls.ForEach(b => b.IsAlive = false);
         }
 
         //The user loses when there are no more combinations of balls left

@@ -44,6 +44,8 @@ namespace BallBuster
         GameState gameState;
         Song gameplayMusic;
 
+        bool gameIsInProgress;
+
         public GamePage()
         {
             // Use the LayoutUpdate event to know when the page layout 
@@ -62,6 +64,7 @@ namespace BallBuster
             timer.Draw += OnDraw;
 
             gameState = GameState.Game;
+            gameIsInProgress = false;
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
@@ -78,42 +81,47 @@ namespace BallBuster
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(SharedGraphicsDeviceManager.Current.GraphicsDevice);
 
-            highScore = GetHighScore();
-            HighScoreNumber.Text = highScore.ToString();
-
-            gameBoard = new GameBoard();
-
-            gameplayMusic = contentManager.Load<Song>("Sounds/menuMusic");
-
-            //Load the content for the textures of the 6 different types of balls
-            Texture2D blue = contentManager.Load<Texture2D>("BallSprites/blue");
-            Texture2D green = contentManager.Load<Texture2D>("BallSprites/green");
-            Texture2D purple = contentManager.Load<Texture2D>("BallSprites/purple");
-            Texture2D red = contentManager.Load<Texture2D>("BallSprites/red");
-            Texture2D teal = contentManager.Load<Texture2D>("BallSprites/teal");
-            Texture2D yellow = contentManager.Load<Texture2D>("BallSprites/yellow");
-
-            gameBoard.AddBallTexture("blue", blue);
-            gameBoard.AddBallTexture("green", green);
-            gameBoard.AddBallTexture("purple", purple);
-            gameBoard.AddBallTexture("red", red);
-            gameBoard.AddBallTexture("teal", teal);
-            gameBoard.AddBallTexture("yellow", yellow);
-
-            try
+            if (!gameIsInProgress)
             {
-                MediaPlayer.Play(gameplayMusic);
-                MediaPlayer.IsRepeating = true;
-            }
-            catch { }
-                
-            gameBoard.Initialize();
+                gameIsInProgress = true;
 
-            // TODO: use this.content to load your game content here
-            
+                highScore = GetHighScore();
+                HighScoreNumber.Text = highScore.ToString();
+
+                gameBoard = new GameBoard();
+
+                gameplayMusic = contentManager.Load<Song>("Sounds/menuMusic");
+
+
+                //Load the content for the textures of the 6 different types of balls
+                Texture2D blue = contentManager.Load<Texture2D>("BallSprites/blue");
+                Texture2D green = contentManager.Load<Texture2D>("BallSprites/green");
+                Texture2D purple = contentManager.Load<Texture2D>("BallSprites/purple");
+                Texture2D red = contentManager.Load<Texture2D>("BallSprites/red");
+                Texture2D teal = contentManager.Load<Texture2D>("BallSprites/teal");
+                Texture2D yellow = contentManager.Load<Texture2D>("BallSprites/yellow");
+
+                gameBoard.AddBallTexture("blue", blue);
+                gameBoard.AddBallTexture("green", green);
+                gameBoard.AddBallTexture("purple", purple);
+                gameBoard.AddBallTexture("red", red);
+                gameBoard.AddBallTexture("teal", teal);
+                gameBoard.AddBallTexture("yellow", yellow);
+
+                try
+                {
+                    MediaPlayer.Play(gameplayMusic);
+                    MediaPlayer.IsRepeating = true;
+                }
+                catch { }
+
+                gameBoard.Initialize();
+
+                // TODO: use this.content to load your game content here
+            }
+
             // Start the timer
             timer.Start();
-
             base.OnNavigatedTo(e);
         }
 
@@ -122,9 +130,11 @@ namespace BallBuster
             // Stop the timer
             timer.Stop();
 
-            MediaPlayer.Stop();
-
-            gameBoard = null;
+            if (!gameIsInProgress && gameBoard.IsLost)
+            {
+                MediaPlayer.Stop();
+                gameBoard = null;
+            }
 
             // Set the sharing mode of the graphics device to turn off XNA rendering
             SharedGraphicsDeviceManager.Current.GraphicsDevice.SetSharingMode(false);
@@ -155,8 +165,6 @@ namespace BallBuster
 
                         if (gameBoard.IsLost)
                         {
-                            SaveHighScore(gameBoard.Score);
-                            MessageBox.Show("YOU LOSE HAH", "YOu lose", MessageBoxButton.OK);
                             NavigationService.GoBack();
                         }
                     }
