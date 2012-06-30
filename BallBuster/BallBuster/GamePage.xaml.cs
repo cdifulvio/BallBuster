@@ -1,6 +1,4 @@
 ﻿using System;
-using System.IO;
-using System.IO.IsolatedStorage;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -16,7 +14,7 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
-using Microsoft.Xna.Framework.Media;
+using Microsoft.Xna.Framework.Audio;
 
 namespace BallBuster
 {
@@ -28,7 +26,7 @@ namespace BallBuster
         // For rendering the XAML onto a texture
         UIElementRenderer elementRenderer;
 
-        int highScore;
+        int previousHighScore;
 
         float xcoord;
         float ycoord;
@@ -42,9 +40,10 @@ namespace BallBuster
         }
 
         GameState gameState;
-        Song gameplayMusic;
 
         bool gameIsInProgress;
+
+        SoundEffect popSoundEffect;
 
         public GamePage()
         {
@@ -63,7 +62,6 @@ namespace BallBuster
             timer.Update += OnUpdate;
             timer.Draw += OnDraw;
 
-            gameState = GameState.Game;
             gameIsInProgress = false;
         }
 
@@ -84,14 +82,14 @@ namespace BallBuster
             if (!gameIsInProgress)
             {
                 gameIsInProgress = true;
+                gameState = GameState.Game;
 
-                highScore = GetHighScore();
-                HighScoreNumber.Text = highScore.ToString();
+                previousHighScore = HighScoreManager.GetHighScore();
+                HighScoreNumber.Text = previousHighScore.ToString();
+
+                popSoundEffect = contentManager.Load<SoundEffect>("Sounds/popSound");
 
                 gameBoard = new GameBoard();
-
-                gameplayMusic = contentManager.Load<Song>("Sounds/menuMusic");
-
 
                 //Load the content for the textures of the 6 different types of balls
                 Texture2D blue = contentManager.Load<Texture2D>("BallSprites/blue");
@@ -108,16 +106,7 @@ namespace BallBuster
                 gameBoard.AddBallTexture("teal", teal);
                 gameBoard.AddBallTexture("yellow", yellow);
 
-                try
-                {
-                    MediaPlayer.Play(gameplayMusic);
-                    MediaPlayer.IsRepeating = true;
-                }
-                catch { }
-
                 gameBoard.Initialize();
-
-                // TODO: use this.content to load your game content here
             }
 
             // Start the timer
@@ -132,7 +121,6 @@ namespace BallBuster
 
             if (!gameIsInProgress && gameBoard.IsLost)
             {
-                MediaPlayer.Stop();
                 gameBoard = null;
             }
 
@@ -161,10 +149,28 @@ namespace BallBuster
 
                     if (gameState == GameState.Game)
                     {
-                        gameBoard.Update(xcoord, ycoord);
+                        bool removedBalls = gameBoard.Update(xcoord, ycoord);
+
+                        if (removedBalls)
+                        {
+                            popSoundEffect.Play(1.0f, 0.0f, 0.0f);
+                        }
 
                         if (gameBoard.IsLost)
                         {
+                            bool scoreIsHigher = HighScoreManager.SaveHighScore(gameBoard.Score, previousHighScore);
+
+                            if (scoreIsHigher)
+                            {
+                                MessageBox.Show(
+                                    String.Format("You beat your old high score of {0} with your score of {1}!",
+                                                  previousHighScore, gameBoard.Score));
+                            }
+                            else
+                            {
+                                MessageBox.Show("You didn't beat your high score. Play again for a chance to beat it!");
+                            }
+
                             NavigationService.GoBack();
                         }
                     }
@@ -205,66 +211,6 @@ namespace BallBuster
             spriteBatch.Draw(elementRenderer.Texture, Vector2.Zero, Color.White);
 
             spriteBatch.End();
-        }
-
-        private void SaveHighScore(int score)
-        {
-            if (score > highScore)
-            {
-                using (var store = IsolatedStorageFile.GetUserStoreForApplication())
-                {
-                    string directoryName = System.IO.Path.GetDirectoryName("HighScore");
-
-                    if (string.IsNullOrEmpty(directoryName) || !store.DirectoryExists("HighScore"))
-                    {
-                        store.CreateDirectory("HighScore");
-                    }
-
-                    using (IsolatedStorageFileStream fileStream = store.OpenFile("HighScore\\ballhighscore.txt", FileMode.OpenOrCreate, FileAccess.Write))
-                    {
-                        using (StreamWriter writer = new StreamWriter(fileStream))
-                        {
-                            writer.Write(score);
-                            writer.Close();
-                        }
-                    }
-                }
-            }
-        }
-
-        private int GetHighScore()
-        {
-            int high = 0;
-
-            using (var store = IsolatedStorageFile.GetUserStoreForApplication())
-            {
-                try
-                {
-                    if (store.FileExists("HighScore\\ballhighscore.txt"))
-                    {
-                        using (IsolatedStorageFileStream fileStream = store.OpenFile("HighScore\\ballhighscore.txt", FileMode.Open, FileAccess.Read))
-                        {
-                            using (StreamReader reader = new StreamReader(fileStream))
-                            {
-                                string line;
-                                if ((line = reader.ReadLine()) != null)
-                                {
-                                    high = int.Parse(line);
-                                }
-
-                                reader.Close();
-                            }
-                        }
-                    }
-                }
-                catch
-                {
-                    //No high score yet
-                    high = 0;
-                }
-            }
-
-            return high;
         }
 
         private void GamePage_LayoutUpdated(object sender, EventArgs e)

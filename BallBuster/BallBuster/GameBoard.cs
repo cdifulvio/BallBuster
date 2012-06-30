@@ -127,8 +127,10 @@ namespace BallBuster
             }
         }
 
-        public void Update(float xCoordinate, float yCoordinate)
+        public bool Update(float xCoordinate, float yCoordinate)
         {
+            bool removedBalls = false;
+
             if (yCoordinate >= 100 && yCoordinate <= 770)
             {
                 previouslySelectedHorizontalIndex = selectedHorizontalIndex;
@@ -151,7 +153,10 @@ namespace BallBuster
                         firstTap)
                     {
                         firstTap = false;
+
                         RemoveAdjacentBalls(selectedBall, "");
+                        removedBalls = true;
+
                         totalScore += selectionScore;
                         showScore = false;
                         UpdateColumns();
@@ -181,6 +186,8 @@ namespace BallBuster
                     }
                 }
             }
+
+            return removedBalls;
         }
 
         public void Draw(SpriteBatch spriteBatch)
