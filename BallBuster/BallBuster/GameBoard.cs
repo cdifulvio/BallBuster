@@ -147,10 +147,9 @@ namespace BallBuster
                 {
                     Ball selectedBall = ballMatrix[selectedHorizontalIndex, selectedVerticalIndex];
 
-                    //If already tapped once and the second tap is in the same place, continue with removing the balls
-                    if (previouslySelectedHorizontalIndex == selectedHorizontalIndex && 
-                        previouslySelectedVerticalIndex == selectedVerticalIndex && 
-                        firstTap)
+                    //If already tapped once and the second tap is one of the balls which are part of the same group
+                    if (firstTap &&
+                        lastPopulatedListOfBalls.Contains(selectedBall))
                     {
                         firstTap = false;
 
